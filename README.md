@@ -12,6 +12,8 @@ Sadly, I know nothing about flights or aviation so I can't verify how fun the ga
 - ~~Make it look like a game~~
 - ~~Make the MVP with the basic ability to guess flight info.~~
 - ~~Add some basic CSS Styling to highlight correct and incorrect answers~~
+- ~~Add Light/Dark Mode~~
+- For some reason, light/dark mode works but only on the second or third click? No idea why. Maybe I'll ask someone for help.
 - Maybe add a "Aviation Trivia" Screen?
 - Maybe make the styling look cooler?
 
