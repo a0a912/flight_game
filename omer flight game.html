@@ -9,6 +9,15 @@
     <style>
 
         /*
+        Apply this styling to all p tags in the trivia_content div
+         */
+        #trivia_content p {
+            font-size: 20px;
+            font-style: italic;
+            border: orange solid 2px;
+        }
+
+        /*
         This applies green and red borders to the correct and wrong answers
         */
         .correct {
@@ -24,12 +33,13 @@
 <h1>Omer Flight Guessing Game Attempt 3 V1.01</h1>
 
 
-<!-- A button to toggle between light and dark mode -->
+<!-- A button to toggle between light and dark mode. NOTE: For some reason it takes a few seconds and clicks before it works. No Idea why. -->
 <button type="button" id="light_setting">Click to toggle between light and dark mode</button>
 
-
+<!-- This div box will display what flight the user has to guess stuff on. That info will be updated in the get_random_flight_info function in the JS section below -->
 <div id="starting_info"></div>
 
+<!-- This is the "main gameplay" box. User will be gussing stuff here -->
 <div id="guess_box" class="guess_box">
 
     <form id="guess_form" class="guess_form">
@@ -50,8 +60,20 @@
 
     </form>
 </div>
-
+<!-- After the using is done the answers will be displayed here. Along with a red or green border depending on if the guess was correct or not -->
 <div id="answers"></div>
+
+<br> <hr> <br>
+<!-- TODO: Add Aviation Trivia Stuff -->
+
+<!-- A button the user can press to generate a new aviation trivia, fact or quote -->
+<button type="button" id="trivia_button">Click to generate a new aviation trivia, fact or quote </button>
+
+<!--  -->
+<!-- Empty Div to hold trivia content. Will be filled in JS -->
+<div id="trivia_content"></div>
+
+
 <script>
 
     //Global Variables
@@ -62,27 +84,95 @@
 
     //TODO: Add Aviation Trivia Stuff
 
+    //Array of strings to hold aviation trivia
+    const aviationTrivia = [
+        "1: The Wright brothers, Orville and Wilbur, made their first successful powered flight on December 17, 1903, near Kitty Hawk, North Carolina. The flight lasted 12 seconds and covered a distance of 120 feet. - Source: ChatGPT",
+        "2: The fastest manned aircraft ever flown is the North American X-15. It set the world record for the highest speed ever recorded by a manned aircraft—Mach 6.72, which is about 4,520 miles per hour (7,274 km/h). - Source: ChatGPT",
+        "3: The Boeing 747, also known as the \"Jumbo Jet,\" has a wingspan longer than the Wright brothers' first flight. The wingspan of the Boeing 747-8 is 224 feet, while the Wright Flyer had a wingspan of 40 feet. - Source: ChatGPT",
+        "4: According to my AI code generator Codeium, 'The Wright brothers' first plane was the 747-8. The Wright brothers' second plane was the 747-4'. - Source: Codeium",
+        "5: The Concorde, a supersonic passenger airliner operated from 1976 to 2003, could fly at speeds over twice the speed of sound. It could travel from New York to London in about 3.5 hours. - Source: ChatGPT",
+        "6: According to my AI code generator Codeium, 'The Wright brothers' first powered flight was the Wright Flyer, which was an airship that carried 10,000 passengers. The Wright Flyer was launched in 1903'. - Source: Codeium",
+        "7: The Airbus A380, the world's largest passenger airliner, has a maximum takeoff weight of over 1.2 million pounds (560,000 kg). It can accommodate up to 853 passengers in a single-class configuration. - Source: ChatGPT",
+        "8: The shortest regularly scheduled commercial flight in the world is between the two Orkney Islands, Westray and Papa Westray in Scotland. The flight covers a distance of approximately 1.7 miles (2.7 km) and takes just 1 minute and 14 seconds. - Source: ChatGPT",
+        "9: The term \"Mayday\" used in distress calls comes from the French word \"m'aider,\" which means \"help me.\" - Source: ChatGPT",
+        "10: The first woman to fly solo around the world was Geraldine \"Jerrie\" Mock in 1964. She completed the journey in her Cessna 180, named the \"Spirit of Columbus.\" - Source: ChatGPT",
+        "11: The International Space Station (ISS) is the largest human-made structure in space, and it travels at an average speed of 17,500 miles per hour (28,000 km/h). Despite its name, it's not located in space—technically, it's in a region of the Earth's atmosphere called low Earth orbit. - Source: ChatGPT",
+        "12: Hartsfield-Jackson Atlanta International Airport (ATL) in the United States has been the world's busiest airport by passenger traffic since 1998. - Source: ChatGPT",
+        "13: The Boeing 737 is the best-selling commercial jetliner in history. Boeing has produced over 10,000 units of the 737 since its introduction in 1968.- Source: ChatGPT",
+        "14: The Airbus A320 family was the first to introduce digital \"fly-by-wire\" flight control systems in commercial aircraft, revolutionizing cockpit technology and enhancing flight safety. - Source: ChatGPT",
+        "15: The longest non-stop commercial flight in the world as of 2022 is Singapore Airlines' flight SQ22, which operates between Singapore Changi Airport and Newark Liberty International Airport in New Jersey, USA. It covers a distance of approximately 9,534 miles (15,343 km) and takes about 18 hours and 30 minutes. - Source: ChatGPT",
+        "16: The first commercial flight of the iconic Boeing 747, often referred to as the \"Queen of the Skies,\" took place on January 22, 1970, with Pan American World Airways (Pan Am) flying from New York to London.. - Source: ChatGPT",
+        "17: The world's largest passenger airliner, the Airbus A380, has a wingspan of 261.8 feet (79.8 meters), which is longer than the aircraft itself. Its wingspan is longer than the aircraft's overall length. - Source: ChatGPT",
+        "18: Dubai International Airport (DXB) in the United Arab Emirates is home to the world's busiest international route, which is operated by Emirates airline between Dubai and London Heathrow Airport. - Source: https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "19: The reason why airlines dim the cabin light during night flight isn’t solely about letting passengers sleeper tighter. It creates a safer environment by making the emergency exits easier for passengers to find while also allowing passengers to adjust their vision if an emergency occurs - Source:  https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "20: In 1987, American Airlines saved $40,000 by removing one olive from each salad served in first-class. - Source: ChatGPT and https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "21: Some airlines have experimented with unusual inflight entertainment options. For example, Virgin Atlantic once offered passengers the opportunity to listen to a live performance by a classical orchestra during their flight. - Source: ChatGPT",
+        "22: The Boeing Everett Factory in Washington, USA, is the largest building in the world by volume. It covers over 98 acres and is where Boeing assembles its wide-body aircraft, including the 747, 767, 777, and 787. - Source: ChatGPT",
+        "23: In 2013, a stray cat named Bob sneaked into the cargo hold of a KLM flight from Athens to Amsterdam. The cat was discovered upon arrival and adopted by the airline's staff, becoming KLM's unofficial mascot. - Source: ChatGPT",
+        "24: The world's largest passenger airplane-shaped building is the Super Big Airplane Terminal in China's Henan province. It serves as an aviation-themed restaurant and event venue and is designed to resemble the Airbus A380. - Source: ChatGPT",
+        "25: The Wright brothers' first powered flight was the Wright Flyer, which was an airship that carried 10,000 passengers. The Wright Flyer was launched in 1903. - Source: ChatGPT",
+        "26: The average cruising altitude of a commercial plane still is approximately 90,000m below the Kármán line — which is defined as the official border between the earth’s surface and outer space. - Source: https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "27: 95% of the world’s population has never been on a flight. That means 7,410,000,000 people have never boarded an airplane. - Source: https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "28: The atmosphere in an airline cabin reduces your ability to detect tastes by about 30 percent—think of it as your taste buds go numb. This is normally why tomato juice tastes better on flights - Source: https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "29: The Wright brothers' first powered flight was the Wright Flyer, which was an airship that carried 10,000 passengers. The Wright Flyer was launched in 1903. - Source: ChatGPT",
+        "30: 80% of the world’s population is afraid of flying — so-called aerophobia. - Source: https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "31: Alaska Airlines was the first airline that introduced online check in 1999. - Source: https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "32: The highest price that’s has ever been paid for a flight ticket is $123,000. An Australian millionaire pought that ticket for a flight from Singapore to Sydney in 2007 — at it was the maiden flight of the A380. - Source: https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "33: The likelihood that a man cries when watching a movie on an airplane is 15% higher to when watching the movie on ground. - Source: https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "34: The safest section of an aircraft is the back third. The fatality rate of passengers is “only” 32% — whereas mid and front third the fatalitiy rate is ~38%. So make sure to chose a seat at the back! - Source: https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "35: Qantas Airways was the first airline in the world that introduced the business class — in 1979. - Source: https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "36: The tray table is the dirtiest place on an airplane. The bacteria levels found on tray tables is even three times as high as levels on toilet flush button. - Source: https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "37: 1919 was the year when food was served on a plane for the first time. This happended on a trip from London to Paris. However, the sandwich wasn’t for free but cost 3 Schlling back then. - Source: https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "38: In order to simulate bird strikes, airlines use so-called “Chicken Guns” to shoot dead chickens straight into the engine. - Source: https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "39: The likelihood that your flight crashes is extremely low. Actually this likeliness is about 0.000024%. - Source: https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "40: Up to now, 5.6 Billion people have travelled on a Boeing 747 aircraft! - Source: https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "41: Up to today, 78 billion kilometers have been logged on all flights with a 747 aircraft. That’s 100,000 times to the moon and back! - Source: https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "42: In 2019, 1.7 Million bags were lost worldwide! And lost really means lost. That doesn’t include the mishandled bags that were delivered late! - Source: https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "43: OMER. Use the Delta Emulator to play Pokemon Games on the iPhone. It's really fun 😇 - Source: Me",
+        "44: All your base are belong to us",
+        "45: On average the human body loses 1.5 liters of water on a 3 hour flight! - Source: https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "46: 80% of all plane crashes happen during take-off and landing. - Source: https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "47: The amount of fuel that goes into a Boeing 747 could fuel 1,400 mini vans! - Source: https://www.id1.de/2020/09/30/the-ultimate-source-for-crazy-aviation-facts/",
+        "48: The deadliest commercial aviation accident in history occurred on March 27, 1977, when two Boeing 747s collided on the runway at Tenerife Airport in the Canary Islands. The collision resulted in 583 fatalities, making it the deadliest aviation accident to date. - Source: ChatGPT",
+        "49: Malaysia Airlines Flight 17 was shot down by a surface-to-air missile over eastern Ukraine on July 17, 2014. All 298 passengers and crew on board were killed. The incident occurred during the armed conflict between Ukrainian government forces and pro-Russian separatists. - Source: ChatGPT",
+        "50: Nanomachines Son. They harden in response to physical Trauma. - Source: General Armstrong",
+        "51: Aircraft emit greenhouse gases such as carbon dioxide (CO2), nitrous oxide (N2O), and water vapor, contributing to climate change. Commercial aviation accounts for about 2-3% of global CO2 emissions. - Source: ChatGPT",
+        "51: Contrails, the white streaks left by aircraft in the sky, contribute to the formation of cirrus clouds, which trap heat in the atmosphere and contribute to global warming. - Source: ChatGPT",
+        "52: Airports and aircraft operations can lead to habitat destruction, noise pollution, and disruption of wildlife migration patterns in surrounding areas. - Source: ChatGPT",
+        "53: Aircraft emissions at high altitudes have a greater impact on the environment due to the formation of additional pollutants such as ozone and sulfate aerosols. - Source: ChatGPT",
+        "54: Aircraft engines emit nitrogen oxides (NOx), which contribute to air pollution and smog formation, particularly around airports and heavily trafficked air corridors. - Source: ChatGPT",
+        "55: Aviation fuel spills during refueling and maintenance activities can contaminate soil and water sources, posing risks to ecosystems and human health. - Source: ChatGPT",
+        "56: De-icing fluids used to remove ice and frost from aircraft surfaces contain chemicals that can pollute waterways and harm aquatic life. - Source: ChatGPT",
+        "57: Air travel is often inaccessible to low-income individuals due to high ticket prices, which can exacerbate social inequalities and limit mobility for certain populations. - Source: ChatGPT",
+        "58: The Concorde flew so fast that it stretched between 6 and 10 inches during flight because the friction with the air caused it to heat up so much.- Source: https://old.reddit.com/r/aviation/comments/y5zlpl/what_are_some_cool_plane_facts_i_can_use_to/ismrlzy/",
+        "59: The Airbus A220 is not an Airbus. It was designed by Bombardier as the C Series. It first flew in 2013 and the plane actually entered service in 2016 prior to being re-named. Bombardier, due to pressure from Boeing on the US Government to tariff the airplane, ran into financial problems, sold the project to Airbus in 2017. Airbus has continued the development of the project and developed new variants of the type since, and of course, re-named it the A220. This successfully circumvented US tariffs and the plane has since been a commercial success with 227 built as of September 2022. The largest operator in the United States is... you guessed it... Delta Airlines, and you can also fly it with JetBlue and Air Canada. The type also has a perfect safety record as of 2022. - Source: https://old.reddit.com/r/aviation/comments/y5zlpl/what_are_some_cool_plane_facts_i_can_use_to/isncngk/",
+        "60:  general aviation is about as safe as riding a motorcycle. It‘s only commercial aviation that‘s safer than riding in a car. - Source: https://old.reddit.com/r/aviation/comments/1b8k0yf/whats_an_aviation_fact_that_seems_weird_to_you/ktr8g9q/",
+        "61: Generally speaking, any time a passenger can see a pilot, the pilot is not getting paid. - Source: https://old.reddit.com/r/aviation/comments/1b8k0yf/whats_an_aviation_fact_that_seems_weird_to_you/ktpvf9l/",
+        "62: Airplanes haven't actually flown since the 70's. Teleportation is a lot cheaper, but we can't officially acknowledge its existence. We are able to maintain the appearance of \"flying\" with holographic projectors and various other simulation devices, but sometimes these malfunction and we have to gas everyone. Also, George Bush was a reptillian. - Source: https://www.reddit.com/r/AskReddit/comments/2ov2pw/comment/cmqqzel/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button",
+        "63:"
+
+
+    ]
 
     
-    //"Local" Variable Declarations
+    //DOM Variable Declarations
 
-    var guess_form = document.getElementById("guess_form");
-    var answers = document.getElementById("answers");
-    var starting_info = document.getElementById("starting_info");
-    var light_setting = document.getElementById("light_setting");
+    let guess_form = document.getElementById("guess_form");
+    let answers = document.getElementById("answers");
+    let starting_info = document.getElementById("starting_info");
+    let light_setting = document.getElementById("light_setting");
     //var body = document.getElementsByTagName("body");
-    var guess_submit_button = document.getElementById("guess_submit");
-    var reset_button = document.getElementById("reset_button");
-    var body = document.body;
+    let guess_submit_button = document.getElementById("guess_submit");
+    let reset_button = document.getElementById("reset_button");
+    let body = document.body;
     let aircraft_type;
     let departure;
     let arrival;
     let flight_number;
+    let trivia_button = document.getElementById("trivia_button");
+    let trivia_content = document.getElementById("trivia_content");
 
     //Function Declarations
-
-
-
     function random_number_generator(number) {
         // Generates a random number between 0 and the given number (exclusive).
         //
@@ -110,7 +200,7 @@
         departure = flightData[random_number]["departure"];
         arrival = flightData[random_number]["arrival"];
         flight_number = flightData[random_number]["flight_number"];
-        starting_info.innerHTML = `<h3> Guess the info on the following flight: ${flight_number}. Note. Click the reset button to get a new flight. Also, the light/dark mode button needs 3 extra seconds to load before it works for some reason.</h3>`
+        starting_info.innerHTML = `<h3> Guess the info on the following flight: ${flight_number}. Note. Click the reset button to get a new flight. Also, the light/dark mode button needs 3 extra seconds and 3 extra clicks to load before it works for some reason.</h3>`
     }
 
     get_random_flight_info();
@@ -200,6 +290,11 @@
 
     }
 
+    //Function for Trivia
+    function trivia_button_function() {
+        trivia_content.innerHTML = `<p>${aviationTrivia[random_number_generator(aviationTrivia.length)]}</p>`
+    }
+
 
 
 
@@ -210,6 +305,8 @@
 
     guess_form.addEventListener("submit", guess_submit);
     reset_button.addEventListener("click", reset_button_function);
+
+    trivia_button.addEventListener("click", trivia_button_function);
 
 
 
