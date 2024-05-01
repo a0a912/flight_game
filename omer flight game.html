@@ -12,9 +12,12 @@
         Apply this styling to all p tags in the trivia_content div
          */
         #trivia_content p {
+            overflow: scroll;
             font-size: 20px;
             font-style: italic;
-            border: orange solid 2px;
+            border: 5px solid #61D095;
+            padding: 10px;
+            border-radius: 5px;
         }
 
         /*
@@ -22,19 +25,73 @@
         */
         .correct {
             border: green solid 2px;
+            padding: 10px;
+            border-radius: 5px;
         }
 
         .wrong {
             border: red solid 2px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        html{
+            line-height: 1.5;
+        }
+
+        body{
+            width: 80%;
+            margin: 5rem auto;
+            padding: 1rem 2rem 2rem;
+            border: 0.2rem solid #439775;
+        }
+
+        h1 {
+            color: #48BF84;
+        }
+
+        button{
+            text-decoration: none;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            margin: 0.5rem;
+            display: inline-block;
+            background-color: #2A4747;
+            color: white;
+            border: 0.2rem solid #2A4747;
+        }
+
+        #guess_submit{
+            background-color: #439775;
+            padding: 0.5rem;
+            border-radius: 50px;
+            color: white;
+            border: white;
+        }
+
+        #reset_button{
+            background-color: #439775;
+            padding: 0.5rem;
+            border-radius: 50px;
+            color: white;
+            border: white;
+            margin-top: 0.5rem;
+        }
+
+        .inputs{
+            padding: 0.2rem;
+            border-radius: 10px;
+            margin-top: 2px;
         }
     </style>
+
 </head>
 <body>
-<h1>Omer Flight Guessing Game Attempt 3 V1.01</h1>
+<h1>Omer Flight Guessing Game Attempt 3 V2.0</h1>
 
 
 <!-- A button to toggle between light and dark mode. NOTE: For some reason it takes a few seconds and clicks before it works. No Idea why. -->
-<button type="button" id="light_setting">Click to toggle between light and dark mode</button>
+<button type="button" id="light_setting">Light or Dark Mode</button>
 
 <!-- This div box will display what flight the user has to guess stuff on. That info will be updated in the get_random_flight_info function in the JS section below -->
 <div id="starting_info"></div>
@@ -44,19 +101,21 @@
 
     <form id="guess_form" class="guess_form">
         <label for="departure_guess"> Guess Departure City's 3 letter code: </label>
-        <input type="text" id="departure_guess" name="departure_guess">
+        <input type="text"
+               class = "inputs" id="departure_guess" name="departure_guess">
         <br>
         <label for="arrival_guess"> Guess Arrival City's 3 letter code: </label>
-        <input type="text" id="arrival_guess" name="arrival_guess">
+        <input type="text"
+               class = "inputs" id="arrival_guess" name="arrival_guess">
         <br>
         <label for="aircraft_guess"> Guess Type of Aircraft: </label>
-        <input type="text" id="aircraft_guess" name="aircraft_guess">
+        <input type="text" id="aircraft_guess" class = "inputs" name="aircraft_guess">
         <br>
 
         <input id="guess_submit" type="submit">
         <br>
         <input id="reset_button" type="reset">
-        
+
 
     </form>
 </div>
@@ -154,7 +213,7 @@
 
     ]
 
-    
+
     //DOM Variable Declarations
 
     let guess_form = document.getElementById("guess_form");
@@ -256,7 +315,7 @@
         }
         guess_submit_button.disabled = true;
 
-        
+
     }
 
     function light_dark_mode(event) {
@@ -268,8 +327,9 @@
         // Returns:
         // None.  (Edits the DOM directly)
         if (body.style.backgroundColor === "white") {
-            body.style.backgroundColor = "black";
+            body.style.backgroundColor = "#2b2d42";
             body.style.color = "white";
+            //change button color using get element by id
 
         }
         else {
